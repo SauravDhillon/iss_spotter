@@ -19,7 +19,26 @@ const fetchMyIP = function(callback) {
     }
     const ip = body.ip;
     callback(null, ip);
+
   });
 };
 
-module.exports = { fetchMyIP };
+const fetchCoordsByIP = function(ip, callback) {
+  needle.get(`http://ipwho.is/${ip}`, (err, response, body) => {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    if (!body.success) {
+      const message = `Success status was ${body.success}. Server message says: ${body.message} when fetching for IP ${body.ip}`;
+      callback(Error(message), null);
+      return;
+    }
+    const latitude = body.latitude;
+    const longitude = body.longitude;
+    callback(null, { latitude, longitude });
+
+  });
+};
+
+module.exports = { fetchMyIP, fetchCoordsByIP };
